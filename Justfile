@@ -71,3 +71,29 @@ uninstall:
     
     echo "Template system uninstalled!"
     echo "Restart your terminal to apply changes"
+
+_invocation_dir:
+    echo "{{invocation_directory()}}"
+
+_resolve_path PATH INVOCATION_DIR:
+    #!/usr/bin/env bash
+    path="{{PATH}}"
+    invocation_dir="{{INVOCATION_DIR}}"
+    if [[ "$path" == "." ]]; then
+        echo "$invocation_dir"
+    elif [[ "$path" == ./* ]]; then
+        echo "$invocation_dir/${path#./}"
+    else
+        echo "$invocation_dir/$path"
+    fi
+
+init TEMPLATE PATH='.':
+    #!/usr/bin/env bash
+    target_path=$(just _resolve_path "{{PATH}}" "{{invocation_directory()}}")
+    cp -r "{{justfile_directory()}}/{{TEMPLATE}}/." "$target_path/"
+
+new TEMPLATE PATH:
+    #!/usr/bin/env bash
+    target_path=$(just _resolve_path "{{PATH}}" "{{invocation_directory()}}")
+    mkdir -p "$target_path"
+    cp -r "{{justfile_directory()}}/{{TEMPLATE}}/." "$target_path/"
