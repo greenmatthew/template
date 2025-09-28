@@ -16,6 +16,7 @@ _default: help
     just --list
 
 # Install the template system
+[confirm("Do you want to install the template system? This will modify your ~/.bashrc file.")]
 install:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -33,6 +34,7 @@ install:
     echo "Run: source {{bashrc_file}} or restart your terminal"
 
 # Uninstall the template system
+[confirm("Do you want to uninstall the template system? This will remove the entry from your ~/.bashrc file.")]
 uninstall:
     #!/usr/bin/env bash
     set -euo pipefail
