@@ -1,0 +1,61 @@
+# Basic Justfile for C++ projects
+# Created by Matthew Green [06/30/2025]
+
+# Configuration
+CXX := "g++"
+CXXFLAGS := "-g -std=c++17 -Iinclude"
+TARGET := "main"
+
+# Source files - manually add your .cpp files here (space-separated)
+CPP_FILES := "src/Main.cpp"
+# Add more files like: CPP_FILES := "src/Main.cpp src/OtherFile.cpp src/Another.cpp"
+
+# Derived variables
+BIN_TARGET := "bin/" + TARGET
+
+# Default recipe
+default: help
+
+# Show help
+help:
+    @just --list
+    @echo ""
+    @echo "Directory structure:"
+    @echo "  src/      - Source files (.cpp)"
+    @echo "  include/  - Header files (.hpp)"
+    @echo "  obj/      - Object files (.o)"
+    @echo "  bin/      - Final executable"
+
+# Create necessary directories
+_setup:
+    @mkdir -p obj bin
+
+# Build the program
+build: _setup
+    @echo "Compiling source files..."
+    @for src in {{CPP_FILES}}; do \
+        obj="obj/$(basename "$src" .cpp).o"; \
+        echo "Compiling $src -> $obj"; \
+        {{CXX}} -c {{CXXFLAGS}} "$src" -o "$obj"; \
+    done
+    @echo "Linking {{BIN_TARGET}}"
+    @obj_files=""; \
+    for src in {{CPP_FILES}}; do \
+        obj_files="$obj_files obj/$(basename "$src" .cpp).o"; \
+    done; \
+    {{CXX}} {{CXXFLAGS}} $obj_files -o {{BIN_TARGET}}
+    @echo "Build complete: {{BIN_TARGET}}"
+
+# Run the program
+run: build
+    ./{{BIN_TARGET}}
+
+# Clean object files only
+clean:
+    rm -rf obj/*.o
+    @echo "Cleaned object files"
+
+# Clean all generated files
+clean-all:
+    rm -rf obj bin
+    @echo "Cleaned all generated files"
